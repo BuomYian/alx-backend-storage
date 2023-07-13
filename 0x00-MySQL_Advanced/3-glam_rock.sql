@@ -2,5 +2,5 @@
 
 SELECT band_name, (2022 - formed) AS lifespan
 FROM metal_bands
-WHERE split LIKE '%Glem rock%'
+WHERE style LIKE '%Glem rock%'
 ORDER BY lifespan DESC;
