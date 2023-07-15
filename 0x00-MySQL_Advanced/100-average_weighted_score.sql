@@ -1,4 +1,4 @@
--- Create the stored peocedure
+-- Create the stored procedure
 DELIMITER //
 CREATE PROCEDURE ComputeAverageWeightedScoreForUser(IN user_id INT)
 BEGIN
@@ -18,6 +18,6 @@ BEGIN
     -- Calculate the average weighted score
     UPDATE users
     SET average_score = total_score / total_weight
-    WHERE id = user_id
+    WHERE id = user_id;
 END //
 DELIMITER ;
