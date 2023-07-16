@@ -1,6 +1,6 @@
 -- Create the stored procedure
 DELIMITER //
-CREATE PROCEDURE ComputerAverageScoreForUser(IN user_id INT)
+CREATE PROCEDURE ComputeAverageScoreForUser(IN user_id INT)
 BEGIN
     DECLARE total_score FLOAT;
     DECLARE total_count INT;
