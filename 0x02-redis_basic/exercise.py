@@ -9,6 +9,25 @@ import uuid
 from typing import Union, Callable, Optional
 from functools import wraps
 
+def count_calls(method: Callable) -> Callable:
+    """
+    Decorator function to count the number of times a method is called.
+
+    Args:
+        method (Callable): The method to be decorated.
+
+    Returns:
+        Callable: The wrapped method with counting functionality.
+    """
+    key = method.__qualname__
+
+    @wraps(method)
+    def wrapped_method(self, *args, **kwargs):
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+
+    return wrapped_method
+
 class Cache:
     """
     Cache class for storing data in Redis.
@@ -21,6 +40,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         Store the input data in Redis using a random key (generated using uuid) and return the key.
@@ -34,7 +54,6 @@ class Cache:
         key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key
-
 
     def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float]:
         """
@@ -52,7 +71,6 @@ class Cache:
             return fn(data)
         return data
 
-
     def get_str(self, key: str) -> str:
         """
         Retrieve data from Redis using the provided key and convert it to a UTF-8 string.
@@ -65,7 +83,6 @@ class Cache:
         """
         return self.get(key, fn=lambda d: d.decode("utf-8"))
 
-
     def get_int(self, key: str) -> int:
         """
         Retrieve data from Redis using the provided key and convert it to an integer.
@@ -77,26 +94,3 @@ class Cache:
             int: The retrieved data as an integer.
         """
         return self.get(key, fn=int)
-
-
-    def count_calls(method: Callable) -> Callable:
-        """
-        Decorator function to count the number of times a method is called.
-
-        Args:
-            method (Callable): The method to be decorated.
-
-        Returns:
-            Callable: The wrapped method with counting functionality.
-        """
-        key = method.__qualname__
-
-        @wraps(method)
-        def wrapped_method(self, *args, **kwargs):
-            self._redis.incr(key)
-            return method(self, *args, **kwargs)
-
-        return wrapped_method
-
-# Decorate the Cache.store method with count_calls
-Cache.store = count_calls(Cache.store)
