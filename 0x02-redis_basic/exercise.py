@@ -130,11 +130,14 @@ def replay(method: Callable):
     Args:
         method (Callable): The method for which to display the history of calls.
     """
+    # Access the Cache instance the method is bound to
+    cache_instance = method.__self__
+
     input_list_key = "{}:inputs".format(method.__qualname__)
     output_list_key = "{}:outputs".format(method.__qualname__)
 
-    inputs = method._redis.lrange(input_list_key, 0, -1)
-    outputs = method._redis.lrange(output_list_key, 0, -1)
+    inputs = cache_instance._redis.lrange(input_list_key, 0, -1)
+    outputs = cache_instance._redis.lrange(output_list_key, 0, -1)
 
     print(f"{method.__qualname__} was called {len(inputs)} times:")
 

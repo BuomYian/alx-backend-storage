@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
-"""
-Main file
-"""
+""" Main file """
 
-Cache = __import__('exercise').Cache
+from exercise import Cache, replay
 
 cache = Cache()
 
-cache.store(b"first")
-print(cache.get(cache.store.__qualname__))
+# Make some calls to the Cache.store method
+s1 = cache.store("foo")
+s2 = cache.store("bar")
+s3 = cache.store(42)
 
-cache.store(b"second")
-cache.store(b"third")
-print(cache.get(cache.store.__qualname__))
+# Print the return values of Cache.store calls
+print(s1)
+print(s2)
+print(s3)
+
+# Show the history of calls for Cache.store using the replay function
+replay(cache.store)
