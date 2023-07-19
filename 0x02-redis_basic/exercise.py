@@ -6,7 +6,7 @@ Cache module.
 
 import redis
 import uuid
-from typing import Union
+from typing import Union, Callable, Optional
 
 class Cache:
     """
@@ -33,3 +33,46 @@ class Cache:
         key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key
+
+
+    def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float]:
+        """
+        Retrieve data from Redis using the provided key and optionally convert it using the given function.
+
+        Args:
+            key (str): The key used to retrieve data from Redis.
+            fn (Optional[Callable]): A callable function to convert the retrieved data. Defaults to None.
+
+        Returns:
+            Union[str, bytes, int, float]: The retrieved data from Redis, optionally converted by the provided function.
+        """
+        data = self._redis.get(key)
+        if data is not None and fn is not None:
+            return fn(data)
+        return data
+
+
+    def get_str(self, key: str) -> str:
+        """
+        Retrieve data from Redis using the provided key and convert it to a UTF-8 string.
+
+        Args:
+            key (str): The key used to retrieve data from Redis.
+
+        Returns:
+            str: The retrieved data as a UTF-8 string.
+        """
+        return self.get(key, fn=lambda d: d.decode("utf-8"))
+
+
+    def get_int(self, key: str) -> int:
+        """
+        Retrieve data from Redis using the provided key and convert it to an integer.
+
+        Args:
+            key (str): The key used to retrieve data from Redis.
+
+        Returns:
+            int: The retrieved data as an integer.
+        """
+        return self.get(key, fn=int)
