@@ -91,10 +91,12 @@ class Cache:
         """
         key = method.__qualname__
 
-
         @wraps(method)
         def wrapped_method(self, *args, **kwargs):
             self._redis.incr(key)
             return method(self, *args, **kwargs)
 
         return wrapped_method
+
+# Decorate the Cache.store method with count_calls
+Cache.store = count_calls(Cache.store)
